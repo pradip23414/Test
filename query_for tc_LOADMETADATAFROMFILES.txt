@@ -1,0 +1,60 @@
+SELECT ci.name as "ConnectionName" ,sc.schemaname as "SchemaName",ot.tablename as "TableName",oc.columnname as "ColumnName",oc.oecolumntype as "Columntype",
+oc.columndescription  as "Title",w.techtext as "TechDescription",w.wikitext as "Business Description", tags.Tagname as "Tagname",bg.name as "Term",
+(case when oc.mask=1 then "Yes" else "No" end ) as "Mask",(case when oc.restricted=1 then "Yes" else "No" end ) as "Restricted",oc.columnlength as "ColumnLength",oc.lastmoddate,oc.steward as "Steward",oc.custodian as "Custodian",oc.owner as "Owner",
+oc.governancerole4 as "GovernanceRole4",oc.governancerole5 as "GovernanceRole5",oc.governancerole6 as "GovernanceRole6",co.tcf1,co.tcf2,co.tcf3,co.tcf4,co.tcf5,co.tcf6,co.tcf7,co.tcf8,co.tcf9,co.tcf10,co.tcf11,
+co.tcf12,co.tcf13,co.tcf14,co.tcf15,co.tcf16,co.tcf17,co.tcf18,co.tcf19,co.tcf20,co.tcf21,co.tcf22,co.tcf23,co.tcf24,co.tcf25,co.tcf26,co.tcf27,co.tcf28,co.tcf29,
+co.tcf30,co.tcf31,co.tcf32,co.tcf33,co.tcf34,co.tcf35,co.tcf36,co.tcf37,co.tcf38,co.tcf39,co.tcf40,co.tcf41,co.tcf42,co.tcf43,co.tcf44,co.tcf45,co.tcf46,co.tcf47,
+co.tcf48,co.tcf49,co.tcf50,co.ncf1,co.ncf2,co.ncf3,co.ncf4,co.ncf5,co.ncf6,co.ncf7,co.ncf8,co.ncf9,co.ncf10,co.ncf11,co.ncf12,co.ncf13,co.ncf14,co.ncf15,co1.ccf1, co1.ccf2,
+co1.ccf3, co1.ccf4,co1.ccf5, co1.ccf6,co1.ccf7,co1.ccf8,co1.ccf9,co1.ccf10,co1.ccf11,co1.ccf12,co1.ccf13, co1.ccf14,co1.ccf15,co.dcf1,co.dcf2,co.dcf3,co.dcf4,co.dcf5,co.dcf6,
+co.dcf7,co.dcf8,co.dcf9,co.dcf10,co.dcf11,co.dcf12,co.dcf13,co.dcf14,co.dcf15
+from oecolumn oc
+left join oetable ot on (oc.oetableid=ot.oetableid)
+inner join oeschema sc on (ot.oeschemaid = sc.oeschemaid)
+inner join connectioninfo ci on (sc.connectioninfoid=ci.connectioninfoid)
+left join businessglossary bg on (bg.businessglossaryid=oc.businessglossaryid)
+left join wiki w on (w.wikiobjectid=oc.oecolumnid and w.wikiobject='oecolumn')
+left join custom_objects  co on (co.objectid=oc.oecolumnid and co.objecttype="oecolumn")
+left join (select oc.oecolumnid ,group_concat(distinct tags.tagname) Tagname
+from oecolumn oc
+left join oetable ot on (oc.oetableid=ot.oetableid)
+inner join oeschema sc on (ot.oeschemaid = sc.oeschemaid)
+inner join connectioninfo ci on (sc.connectioninfoid=ci.connectioninfoid)
+left join columntag on (oc.oecolumnid=columntag.columnid)
+left join tags on (tags.tagid=columntag.tagid)
+group by oc.oecolumnid
+) tags on (tags.oecolumnid=oc.oecolumnid)
+left join (select c.objectid,c.objecttype,
+max(case when c.codetype='ccf1' then `code`.codename end ) as  ccf1,max(case when c.codetype='ccf2' then `code`.codename end ) as ccf2,
+max(case when c.codetype='ccf3' then `code`.codename end ) as ccf3,max(case when c.codetype='ccf4' then `code`.codename end ) as ccf4,
+max(case when c.codetype='ccf5' then `code`.codename end ) as ccf5,max(case when c.codetype='ccf6' then `code`.codename end ) as ccf6,
+max(case when c.codetype='ccf7' then `code`.codename end ) as ccf7,max(case when c.codetype='ccf8' then `code`.codename end ) as ccf8,
+max(case when c.codetype='ccf9' then `code`.codename end ) as ccf9,max(case when c.codetype='ccf10' then `code`.codename end ) as ccf10,
+max(case when c.codetype='ccf11' then `code`.codename end ) as ccf11,max(case when c.codetype='ccf12' then `code`.codename end ) as ccf12,
+max(case when c.codetype='ccf13' then `code`.codename end ) as ccf13,max(case when c.codetype='ccf14' then `code`.codename end ) as ccf14,
+max(case when c.codetype='ccf15' then `code`.codename end ) as ccf15
+from (select distinct objectid,objecttype,"ccf1" as codetype,ccf1 as value from custom_objects
+union  all select distinct objectid,objecttype,"ccf2" as codetype ,ccf2 as value from custom_objects
+union all
+select distinct objectid,objecttype, "ccf3" as codetype,ccf3 as value from custom_objects
+union  all select distinct objectid,objecttype, "ccf4" as codetype ,ccf4 as value from custom_objects
+union all select distinct objectid,objecttype,"ccf5" as codetype,ccf5 as value from custom_objects
+union  all select distinct objectid,objecttype, "ccf6" as codetype ,ccf6 as value from custom_objects
+union all
+select distinct objectid,objecttype,"ccf7" as codetype,ccf7 as value from custom_objects
+union  all select distinct objectid,objecttype,"ccf8" as codetype ,ccf8 as value from custom_objects
+union all
+select distinct objectid,objecttype,"ccf9" as codetype,ccf9 as value from custom_objects
+union  all select distinct objectid,objecttype,"ccf10" as codetype ,ccf10 as value from custom_objects
+union all
+select distinct objectid,objecttype,"ccf11" as codetype,ccf11 as value from custom_objects
+union  all select distinct objectid,objecttype, "ccf12" as codetype ,ccf12 as value from custom_objects
+union all
+select distinct objectid,objecttype,"ccf13" as codetype,ccf13 as value from custom_objects
+union  all select distinct objectid,objecttype,"ccf14" as codetype ,ccf14 as value from custom_objects
+union all select distinct objectid,objecttype,"ccf15" as codetype,ccf15 as value from custom_objects
+) c left join code on (c.value=code.codeid and `code`.objecttype='oecolumn')
+where c.objecttype='oecolumn'
+group by c.objectid,c.objecttype) as  co1 on (co1.objectid=oc.oecolumnid and co1.objecttype="oecolumn")
+
+
+
